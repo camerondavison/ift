@@ -1,5 +1,5 @@
 use ift::eval;
 
 fn main() {
-    println!("{}", eval("Hello, world!".to_owned()));
+    println!("{:?}", eval("en0".to_owned()));
 }
