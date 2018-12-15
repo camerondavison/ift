@@ -1,0 +1,15 @@
+[package]
+name = "ift"
+version = "0.1.0"
+authors = ["Cameron Davison <cameron@novilabs.com>"]
+edition = "2018"
+
+[dependencies]
+
+[lib]
+name = "ift"
+path = "src/ift/lib.rs"
+
+[[bin]]
+name = "ift-cli"
+path = "src/ift-cli/main.rs"
