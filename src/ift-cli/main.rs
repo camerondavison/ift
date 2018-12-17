@@ -4,6 +4,7 @@ use ift::eval;
 fn main() {
     let matches = App::new("ift")
         .setting(AppSettings::SubcommandRequiredElseHelp)
+        .setting(AppSettings::VersionlessSubcommands)
         .version(crate_version!())
         .author(crate_authors!())
         .subcommand(
