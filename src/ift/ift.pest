@@ -1,0 +1,18 @@
+producer = {
+    GetInterfaceIP
+}
+GetInterfaceIP = { "GetInterfaceIP" ~ argument_quoted }
+
+filter = {
+    FilterIPv4
+    | FilterIPv6
+}
+FilterIPv4 = { "FilterIPv4" }
+FilterIPv6 = { "FilterIPv6" }
+
+WHITESPACE = _{ " " }
+argument_quoted = _{ QUOTATION_MARK ~ argument ~ QUOTATION_MARK }
+argument = { ASCII_ALPHANUMERIC* }
+pipe = _{ "|" }
+expression = { producer ~ (pipe ~ filter)* }
+template = _{ SOI ~ expression ~ EOI }

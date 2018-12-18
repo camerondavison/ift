@@ -17,7 +17,6 @@ fn main() {
     match matches.subcommand() {
         ("eval", Some(eval_matches)) => {
             let template = eval_matches.value_of("template").unwrap();
-            eprintln!("template [{}]", template);
             println!("{:?}", eval(template));
         }
         _ => unreachable!(),
