@@ -9,3 +9,6 @@ lint:
 fmt:
 	cargo fmt
 
+.PHONY: test
+test:
+	cargo run --bin ift-cli -- eval 'GetInterfaceIP "lo0" | FilterIPv4'
