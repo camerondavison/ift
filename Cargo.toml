@@ -9,6 +9,7 @@ pnet = "0.21.0"
 clap = "2.32.0"
 pest = "2.0.2"
 pest_derive = "2.0.1"
+ipnet = "2.0.0"
 
 [lib]
 name = "ift"
