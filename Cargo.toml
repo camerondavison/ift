@@ -18,3 +18,4 @@ path = "src/ift/lib.rs"
 [[bin]]
 name = "ift-cli"
 path = "src/ift-cli/main.rs"
+

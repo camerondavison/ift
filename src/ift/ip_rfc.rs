@@ -52,12 +52,12 @@ The IPv4 and IPv6 Special-Purpose Address Registries maintain the
 use ipnet::IpNet;
 use std::net::IpAddr;
 
-struct Rfc6890Entry {
+struct Rfc6890Entry<'a> {
     address_block: IpNet,
-    name: String,
-    rfc: String,
-    allocation_date: String,
-    termination_date: String,
+    name: &'a str,
+    rfc: &'a str,
+    allocation_date: &'a str,
+    termination_date: &'a str,
     source: bool,
     destination: bool,
     forwardable: bool,
@@ -65,19 +65,19 @@ struct Rfc6890Entry {
     reserved_by_protocol: bool,
 }
 
-pub struct Rfc6890 {
-    entries: Vec<Rfc6890Entry>,
+pub struct Rfc6890<'a> {
+    entries: Vec<Rfc6890Entry<'a>>,
 }
 
-impl Rfc6890 {
-    pub fn create() -> Rfc6890 {
+impl<'a> Rfc6890<'a> {
+    pub fn create() -> Rfc6890<'a> {
         Rfc6890 {
             entries: vec![Rfc6890Entry {
                 address_block: "10.0.0.0/8".parse().unwrap(),
-                name: "Private-Use".to_owned(),
-                rfc: "RFC1918".to_owned(),
-                allocation_date: "February 1996".to_owned(),
-                termination_date: "N/A".to_owned(),
+                name: "Private-Use",
+                rfc: "RFC1918",
+                allocation_date: "February 1996",
+                termination_date: "N/A",
                 source: true,
                 destination: true,
                 forwardable: true,
