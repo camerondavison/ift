@@ -409,7 +409,7 @@ impl Rfc6890 {
                     global: false,
                     reserved_by_protocol: false,
                 },
-                Rfc6890Entry {
+                /*Rfc6890Entry {
                     address_block: "2001:10::/28".parse().unwrap(),
                     name: "ORCHID".to_owned(),
                     rfc: "[RFC4843]".to_owned(),
@@ -419,8 +419,8 @@ impl Rfc6890 {
                     destination: false,
                     forwardable: false,
                     global: false,
-                    reserved_by_protocol: false,
-                },
+                    reserved_by_protocol: false
+                },*/
                 Rfc6890Entry {
                     address_block: "2002::/16".parse().unwrap(),
                     name: "6to4".to_owned(),
@@ -506,7 +506,6 @@ fn escape_quotes(s: &str) -> String {
 mod tests {
     use crate::ip_rfc::Rfc6890;
     use ipnet::IpNet;
-    use std::net::IpAddr;
 
     #[test]
     fn get_interface_ip_192() {
@@ -515,7 +514,12 @@ mod tests {
         let rfc = Rfc6890::create();
         for ip_addr in all.hosts() {
             let is_forwardable = specific.contains(&ip_addr);
-            assert_eq!(is_forwardable, rfc.is_forwardable(&ip_addr), "failure on ip {}", ip_addr)
+            assert_eq!(
+                is_forwardable,
+                rfc.is_forwardable(&ip_addr),
+                "failure on ip {}",
+                ip_addr
+            )
         }
     }
 }

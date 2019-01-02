@@ -32,17 +32,18 @@ fn main() {
                 "6890" => rfc_parser::parse_tables(include_str!("rfc6890_entries.txt")),
                 _ => unimplemented!("unknown rfc [{}]", name),
             };
-            //println!("{:?}", info)
 
-            let mut output = vec![];
             for entry in info {
                 match entry.output {
                     Rfc6890(r) => {
-                        output.push(r.as_code())
-                    },
+                        if r.termination_date != "N/A" {
+                            println!(r"/*{},*/", r.as_code());
+                        } else {
+                            println!("{},", r.as_code());
+                        }
+                    }
                 }
             }
-            println!("{}", output.join(",\n"))
         }
         _ => unreachable!(),
     }
