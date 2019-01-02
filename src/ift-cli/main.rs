@@ -1,5 +1,6 @@
 use clap::{crate_authors, crate_version, App, AppSettings, SubCommand};
 use ift::eval;
+use ift::ip_rfc::RfcEntry::Rfc6890;
 use ift::rfc_parser;
 
 fn main() {
@@ -29,9 +30,19 @@ fn main() {
             let name = rfc_matches.value_of("name").unwrap();
             let info = match name {
                 "6890" => rfc_parser::parse_tables(include_str!("rfc6890_entries.txt")),
-                _ => unimplemented!("unknown rfc [{}]", name)
+                _ => unimplemented!("unknown rfc [{}]", name),
             };
-            println!("{:?}", info)
+            //println!("{:?}", info)
+
+            let mut output = vec![];
+            for entry in info {
+                match entry.output {
+                    Rfc6890(r) => {
+                        output.push(r.as_code())
+                    },
+                }
+            }
+            println!("{}", output.join(",\n"))
         }
         _ => unreachable!(),
     }

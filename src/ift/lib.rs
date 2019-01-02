@@ -140,6 +140,13 @@ fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
                     .filter(|ip| rfc.is_forwardable(&ip.ip_addr))
                     .collect(),
             },
+            Rule::FilterGlobal => IfTResult{
+                result: prev
+                    .result
+                    .into_iter()
+                    .filter(|ip| rfc.is_global(&ip.ip_addr))
+                    .collect(),
+            },
             _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
         }
     }
