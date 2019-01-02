@@ -1,6 +1,6 @@
 use clap::{crate_authors, crate_version, App, AppSettings, SubCommand};
 use ift::eval;
-mod rfc_parser;
+use ift::rfc_parser;
 
 fn main() {
     let matches = App::new("ift")

@@ -7,7 +7,8 @@ use pest_derive::*;
 use pnet::datalink::{self, NetworkInterface};
 use std::rc::Rc;
 
-mod ip_rfc;
+pub mod ip_rfc;
+pub mod rfc_parser;
 
 #[derive(Parser)]
 #[grammar = "ift/ift.pest"]
