@@ -8,6 +8,7 @@ use pnet::datalink::{self, NetworkInterface};
 use std::rc::Rc;
 
 pub mod ip_rfc;
+mod rfc6890_entries;
 pub mod rfc_parser;
 
 #[derive(Parser)]
