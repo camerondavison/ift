@@ -195,8 +195,7 @@ mod tests {
 
     #[test]
     fn get_private_ips() {
-        let eval_str = "GetAllInterfaces | FilterGlobal | FilterFlags \"up\"";
-        let expected: IpAddr = "127.0.0.1".parse().unwrap();
-        assert_eq!(eval(eval_str).into_iter().next().unwrap(), expected)
+        let eval_str = "GetAllInterfaces | FilterForwardable | FilterFlags \"up\"";
+        assert!(eval(eval_str).into_iter().next().is_some())
     }
 }
