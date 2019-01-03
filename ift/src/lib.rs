@@ -12,7 +12,7 @@ mod rfc6890_entries;
 pub mod rfc_parser;
 
 #[derive(Parser)]
-#[grammar = "ift/ift.pest"]
+#[grammar = "ift.pest"]
 struct IfTParser;
 
 pub fn eval(s: &str) -> Vec<IpAddr> {

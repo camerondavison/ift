@@ -26,7 +26,7 @@ gen-rfc-6890:
 	echo "use crate::ip_rfc::Rfc6890;" > $(RFC_6890_ENTRIES_RS).tmp
 	echo "use crate::ip_rfc::Rfc6890Entry;" >> $(RFC_6890_ENTRIES_RS).tmp
 	echo "pub fn entries() -> Rfc6890 { Rfc6890 { entries: vec![" >> $(RFC_6890_ENTRIES_RS).tmp
-	cargo run --bin ift-cli -- rfc 6890 >> $(RFC_6890_ENTRIES_RS).tmp
+	cargo run -- rfc 6890 >> $(RFC_6890_ENTRIES_RS).tmp
 	echo "]}}" >> $(RFC_6890_ENTRIES_RS).tmp
 
 	# then move it into the correct loc
@@ -37,6 +37,6 @@ gen: download gen-rfc-6890 fmt
 
 .PHONY: test
 test:
-	cargo run --bin ift-cli -- eval 'GetInterfaceIP "lo0" | FilterIPv4'
-	cargo run --bin ift-cli -- eval 'GetAllInterfaces | FilterForwardable'
-	cargo run --bin ift-cli -- eval 'GetAllInterfaces | FilterGlobal'
+	cargo run -- eval 'GetInterfaceIP "lo0" | FilterIPv4'
+	cargo run -- eval 'GetAllInterfaces | FilterForwardable'
+	cargo run -- eval 'GetAllInterfaces | FilterGlobal'
