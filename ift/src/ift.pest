@@ -12,6 +12,8 @@ filter = {
     | FilterForwardable
     | FilterGlobal
     | FilterName
+    | FilterFirst
+    | FilterLast
 }
 FilterIPv4 = { "FilterIPv4" }
 FilterIPv6 = { "FilterIPv6" }
@@ -19,6 +21,8 @@ FilterFlags = { "FilterFlags" ~ argument_quoted }
 FilterName = { "FilterName" ~ argument_quoted }
 FilterForwardable = { "FilterForwardable" }
 FilterGlobal = { "FilterGlobal" }
+FilterFirst = { "FilterFirst" }
+FilterLast = { "FilterLast" }
 
 WHITESPACE = _{ " " }
 argument_quoted = _{ QUOTATION_MARK ~ argument ~ QUOTATION_MARK }

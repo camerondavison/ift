@@ -36,21 +36,18 @@ fn main() {
                 .map(|ip_addr| ip_addr.to_string())
                 .collect();
 
-            println!("{}", ips.join(" "));
+            println!("[{}]", ips.join(" "));
         }
         ("rfc", Some(rfc_matches)) => {
             let name = rfc_matches.value_of("name").unwrap();
-            match name {
-                "6890" => output(WithRfc6890::create()),
+            let rfc = match name {
+                "6890" => WithRfc6890::create(),
                 _ => unimplemented!("unknown rfc [{}]", name),
             };
+            for entry in rfc.entries {
+                println!("{:?}", entry)
+            }
         }
         _ => unreachable!(),
-    }
-}
-
-fn output(rfc: WithRfc6890) {
-    for entry in rfc.entries {
-        println!("{:?}", entry)
     }
 }

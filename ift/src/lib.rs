@@ -151,6 +151,22 @@ fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
                     .filter(|ip| rfc.is_global(&ip.ip_addr))
                     .collect(),
             },
+            Rule::FilterFirst => IfTResult {
+                result: prev
+                    .result
+                    .into_iter()
+                    .next()
+                    .into_iter()
+                    .collect(),
+            },
+            Rule::FilterLast => IfTResult {
+                result: prev
+                    .result
+                    .into_iter()
+                    .last()
+                    .into_iter()
+                    .collect(),
+            },
             _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
         }
     }
