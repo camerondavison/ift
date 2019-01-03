@@ -1,114 +1,123 @@
-/*
-https://tools.ietf.org/html/rfc6890
-RFC 6890
-
-The IPv4 and IPv6 Special-Purpose Address Registries maintain the
-   following information regarding each entry:
-
-   o  Address Block - A block of IPv4 or IPv6 addresses that has been
-      registered for a special purpose.
-
-   o  Name - A descriptive name for the special-purpose address block.
-
-   o  RFC - The RFC through which the special-purpose address block was
-      requested.
-
-   o  Allocation Date - The date upon which the special-purpose address
-      block was allocated.
-
-   o  Termination Date - The date upon which the allocation is to be
-      terminated.  This field is applicable for limited-use allocations
-      only.
-
-   o  Source - A boolean value indicating whether an address from the
-      allocated special-purpose address block is valid when used as the
-      source address of an IP datagram that transits two devices.
-
-   o  Destination - A boolean value indicating whether an address from
-      the allocated special-purpose address block is valid when used as
-      the destination address of an IP datagram that transits two
-      devices.
-
-   o  Forwardable - A boolean value indicating whether a router may
-      forward an IP datagram whose destination address is drawn from the
-      allocated special-purpose address block between external
-      interfaces.
-
-   o  Global - A boolean value indicating whether an IP datagram whose
-      destination address is drawn from the allocated special-purpose
-      address block is forwardable beyond a specified administrative
-      domain.
-
-   o  Reserved-by-Protocol - A boolean value indicating whether the
-      special-purpose address block is reserved by IP, itself.  This
-      value is "TRUE" if the RFC that created the special-purpose
-      address block requires all compliant IP implementations to behave
-      in a special way when processing packets either to or from
-      addresses contained by the address block.
-
-   If the value of "Destination" is FALSE, the values of "Forwardable"
-   and "Global" must also be false.
-*/
+use crate::rfc6890_entries;
 use ipnet::IpNet;
 use std::net::IpAddr;
 
-struct Rfc6890Entry {
-    address_block: IpNet,
-    name: String,
-    rfc: String,
-    allocation_date: String,
-    termination_date: String,
-    source: bool,
-    destination: bool,
-    forwardable: bool,
-    global: bool,
-    reserved_by_protocol: bool,
+#[derive(Debug)]
+pub enum RfcEntry {
+    Rfc6890(Rfc6890Entry),
+}
+
+#[derive(Debug)]
+pub struct Rfc6890Entry {
+    pub address_block: IpNet,
+    pub name: String,
+    pub rfc: String,
+    pub allocation_date: String,
+    pub termination_date: String,
+    pub source: bool,
+    pub destination: bool,
+    pub forwardable: bool,
+    pub global: bool,
+    pub reserved_by_protocol: bool,
+}
+
+impl Rfc6890Entry {
+    pub fn as_code(&self) -> String {
+        format!(
+            "\
+Rfc6890Entry {{
+    address_block: \"{}\".parse().unwrap(),
+    name: \"{}\".to_owned(),
+    rfc: \"{}\".to_owned(),
+    allocation_date: \"{}\".to_owned(),
+    termination_date: \"{}\".to_owned(),
+    source: {},
+    destination: {},
+    forwardable: {},
+    global: {},
+    reserved_by_protocol: {}
+}}",
+            self.address_block,
+            escape_quotes(&self.name),
+            escape_quotes(&self.rfc),
+            escape_quotes(&self.allocation_date),
+            escape_quotes(&self.termination_date),
+            self.source,
+            self.destination,
+            self.forwardable,
+            self.global,
+            self.reserved_by_protocol
+        )
+    }
 }
 
 pub struct Rfc6890 {
-    entries: Vec<Rfc6890Entry>,
+    pub entries: Vec<Rfc6890Entry>,
 }
-
 impl Rfc6890 {
     pub fn create() -> Rfc6890 {
-        Rfc6890 {
-            entries: vec![Rfc6890Entry {
-                address_block: "10.0.0.0/8".parse().unwrap(),
-                name: "Private-Use".to_owned(),
-                rfc: "RFC1918".to_owned(),
-                allocation_date: "February 1996".to_owned(),
-                termination_date: "N/A".to_owned(),
-                source: true,
-                destination: true,
-                forwardable: true,
-                global: false,
-                reserved_by_protocol: false,
-            }],
-        }
+        rfc6890_entries::entries()
     }
 
     pub fn is_forwardable(&self, ip: &IpAddr) -> bool {
-        for entry in &self.entries {
-            if entry.address_block.contains(ip) {
-                return entry.forwardable;
+        let most_specific = self.find_most_specific(ip);
+
+        if let Some(entry) = most_specific {
+            entry.forwardable
+        } else {
+            false
+        }
+    }
+
+    pub fn is_global(&self, ip: &IpAddr) -> bool {
+        let most_specific = self.find_most_specific(ip);
+
+        if let Some(entry) = most_specific {
+            entry.global
+        } else {
+            false
+        }
+    }
+
+    fn find_most_specific(&self, ip: &IpAddr) -> Option<&Rfc6890Entry> {
+        let mut most_specific: Option<&Rfc6890Entry> = None;
+        for cur in &self.entries {
+            if cur.address_block.contains(ip) {
+                if let Some(existing) = most_specific {
+                    if existing.address_block.contains(&cur.address_block) {
+                        most_specific = Some(cur);
+                    }
+                } else {
+                    most_specific = Some(cur);
+                }
             }
         }
-        false
+        most_specific
     }
+}
+
+fn escape_quotes(s: &str) -> String {
+    s.replace('"', r#"\""#)
 }
 
 #[cfg(test)]
 mod tests {
     use crate::ip_rfc::Rfc6890;
     use ipnet::IpNet;
-    use std::net::IpAddr;
 
     #[test]
-    fn get_interface_ip() {
-        let net: IpNet = "192.0.0.0/29".parse().unwrap();
+    fn get_interface_ip_192() {
+        let all: IpNet = "192.0.0.0/24".parse().unwrap();
+        let specific: IpNet = "192.0.0.0/29".parse().unwrap();
         let rfc = Rfc6890::create();
-        for ip_addr in net.hosts() {
-            assert!(rfc.is_forwardable(&ip_addr))
+        for ip_addr in all.hosts() {
+            let is_forwardable = specific.contains(&ip_addr);
+            assert_eq!(
+                is_forwardable,
+                rfc.is_forwardable(&ip_addr),
+                "failure on ip {}",
+                ip_addr
+            )
         }
     }
 }

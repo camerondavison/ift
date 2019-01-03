@@ -10,6 +10,7 @@ clap = "2.32.0"
 pest = "2.0.2"
 pest_derive = "2.0.1"
 ipnet = "2.0.0"
+regex = "1.1.0"
 
 [lib]
 name = "ift"
@@ -18,3 +19,4 @@ path = "src/ift/lib.rs"
 [[bin]]
 name = "ift-cli"
 path = "src/ift-cli/main.rs"
+
