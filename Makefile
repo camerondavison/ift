@@ -42,5 +42,10 @@ test:
 	cargo run --bin ift-cli -- eval 'GetAllInterfaces | FilterForwardable'
 	cargo run --bin ift-cli -- eval 'GetAllInterfaces | FilterGlobal'
 
+.PHONY: dev-tools
 dev-tools:
 	rustup component add rustfmt --toolchain nightly
+
+.PHONY: clean
+clean:
+	cargo clean
