@@ -28,7 +28,11 @@ pub fn parse_tables(tables: &str) -> Vec<RfcInfo> {
 
 fn parse_table(head: &str, table: &str) -> RfcInfo {
     let v: Vec<usize> = head.match_indices('+').map(|tup| tup.0).collect();
-    assert_eq!(3, v.len(), "expected that the regex only matched 3 '+' signs");
+    assert_eq!(
+        3,
+        v.len(),
+        "expected that the regex only matched 3 '+' signs"
+    );
 
     let mut output = HashMap::new();
     for row in table.split('\n') {
@@ -62,7 +66,9 @@ fn parse_table(head: &str, table: &str) -> RfcInfo {
     };
     //println!("{:?}", entry);
 
-    RfcInfo { output: Rfc6890(entry) }
+    RfcInfo {
+        output: Rfc6890(entry),
+    }
 }
 
 fn remove_footnote<'a, 'b>(map: &'a HashMap<String, String>, key: &'b str) -> &'a str {
@@ -84,7 +90,9 @@ fn parse_bool(map: &HashMap<String, String>, key: &str) -> bool {
     let v = remove_footnote(map, key).to_lowercase();
     match v.as_str() {
         "n/a" => false,
-        _ => v.parse().unwrap_or_else(|_| panic!("unable to parse [{}] as bool", v)),
+        _ => v
+            .parse()
+            .unwrap_or_else(|_| panic!("unable to parse [{}] as bool", v)),
     }
 }
 

@@ -31,7 +31,12 @@ fn main() {
     match matches.subcommand() {
         ("eval", Some(eval_matches)) => {
             let template = eval_matches.value_of("template").unwrap();
-            println!("{:?}", eval(template));
+            let ips: Vec<String> = eval(template)
+                .into_iter()
+                .map(|ip_addr| ip_addr.to_string())
+                .collect();
+
+            println!("{}", ips.join(" "));
         }
         ("rfc", Some(rfc_matches)) => {
             let name = rfc_matches.value_of("name").unwrap();

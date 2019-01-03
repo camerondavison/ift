@@ -20,7 +20,11 @@ struct IfTParser;
 
 pub fn eval(s: &str) -> Vec<IpAddr> {
     match parse_ift_string(s) {
-        Ok(parsed) => parsed.result.into_iter().map(|ip2ni| ip2ni.ip_addr).collect(),
+        Ok(parsed) => parsed
+            .result
+            .into_iter()
+            .map(|ip2ni| ip2ni.ip_addr)
+            .collect(),
         Err(err) => {
             eprintln!("{}", err);
             vec![]
@@ -75,7 +79,9 @@ struct IfTResult {
 }
 
 fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
-    let template = IfTParser::parse(Rule::template, template_str)?.next().unwrap();
+    let template = IfTParser::parse(Rule::template, template_str)?
+        .next()
+        .unwrap();
     let rfc: WithRfc6890 = WithRfc6890::create();
 
     use pest::iterators::Pair;
@@ -94,7 +100,10 @@ fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
 
     fn rule_filter_name(iter: Vec<Ip2NetworkInterface>, name: &str) -> IfTResult {
         IfTResult {
-            result: iter.into_iter().filter(|ip| filter_by_name(ip, name)).collect(),
+            result: iter
+                .into_iter()
+                .filter(|ip| filter_by_name(ip, name))
+                .collect(),
         }
     }
 
@@ -121,7 +130,11 @@ fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
             Rule::FilterFlags => {
                 let flag = pair.into_inner().next().unwrap().as_str();
                 IfTResult {
-                    result: prev.result.into_iter().filter(|ip| filter_by_flag(ip, flag)).collect(),
+                    result: prev
+                        .result
+                        .into_iter()
+                        .filter(|ip| filter_by_flag(ip, flag))
+                        .collect(),
                 }
             }
             Rule::FilterForwardable => IfTResult {
@@ -150,7 +163,9 @@ fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
                 let mut base: IfTResult = parse_producer(producer_pair);
                 for p in iter {
                     match p.as_rule() {
-                        Rule::filter => base = parse_filter(base, p.into_inner().next().unwrap(), rfc),
+                        Rule::filter => {
+                            base = parse_filter(base, p.into_inner().next().unwrap(), rfc)
+                        }
                         _ => unreachable!("only filters should follow. saw {:?}", p.as_rule()),
                     }
                 }
