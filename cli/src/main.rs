@@ -1,7 +1,14 @@
-use clap::{crate_authors, crate_version, App, AppSettings, SubCommand};
-use ift::eval;
-use ift::ip_rfc::RfcEntry::Rfc6890;
-use ift::rfc_parser;
+use clap::{
+    crate_authors,
+    crate_version,
+    App,
+    AppSettings,
+    SubCommand,
+};
+use ift::{
+    eval,
+    rfc::WithRfc6890,
+};
 
 fn main() {
     let matches = App::new("ift")
@@ -28,23 +35,17 @@ fn main() {
         }
         ("rfc", Some(rfc_matches)) => {
             let name = rfc_matches.value_of("name").unwrap();
-            let info = match name {
-                "6890" => rfc_parser::parse_tables(include_str!("rfc6890_entries.txt")),
+            match name {
+                "6890" => output(WithRfc6890::create()),
                 _ => unimplemented!("unknown rfc [{}]", name),
             };
-
-            for entry in info {
-                match entry.output {
-                    Rfc6890(r) => {
-                        if r.termination_date != "N/A" {
-                            println!(r"/*{},*/", r.as_code());
-                        } else {
-                            println!("{},", r.as_code());
-                        }
-                    }
-                }
-            }
         }
         _ => unreachable!(),
+    }
+}
+
+fn output(rfc: WithRfc6890) {
+    for entry in rfc.entries {
+        println!("{:?}", entry)
     }
 }

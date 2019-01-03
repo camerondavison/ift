@@ -1,7 +1,9 @@
-use crate::ip_rfc::Rfc6890;
-use crate::ip_rfc::Rfc6890Entry;
-pub fn entries() -> Rfc6890 {
-    Rfc6890 {
+use crate::rfc::{
+    Rfc6890Entry,
+    WithRfc6890,
+};
+pub fn entries() -> WithRfc6890 {
+    WithRfc6890 {
         entries: vec![
             Rfc6890Entry {
                 address_block: "0.0.0.0/8".parse().unwrap(),

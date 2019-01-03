@@ -1,6 +1,7 @@
-use crate::rfc6890_entries;
 use ipnet::IpNet;
 use std::net::IpAddr;
+
+mod rfc6890_entries;
 
 #[derive(Debug)]
 pub enum RfcEntry {
@@ -21,43 +22,11 @@ pub struct Rfc6890Entry {
     pub reserved_by_protocol: bool,
 }
 
-impl Rfc6890Entry {
-    pub fn as_code(&self) -> String {
-        format!(
-            "\
-Rfc6890Entry {{
-    address_block: \"{}\".parse().unwrap(),
-    name: \"{}\".to_owned(),
-    rfc: \"{}\".to_owned(),
-    allocation_date: \"{}\".to_owned(),
-    termination_date: \"{}\".to_owned(),
-    source: {},
-    destination: {},
-    forwardable: {},
-    global: {},
-    reserved_by_protocol: {}
-}}",
-            self.address_block,
-            escape_quotes(&self.name),
-            escape_quotes(&self.rfc),
-            escape_quotes(&self.allocation_date),
-            escape_quotes(&self.termination_date),
-            self.source,
-            self.destination,
-            self.forwardable,
-            self.global,
-            self.reserved_by_protocol
-        )
-    }
-}
-
-pub struct Rfc6890 {
+pub struct WithRfc6890 {
     pub entries: Vec<Rfc6890Entry>,
 }
-impl Rfc6890 {
-    pub fn create() -> Rfc6890 {
-        rfc6890_entries::entries()
-    }
+impl WithRfc6890 {
+    pub fn create() -> WithRfc6890 { rfc6890_entries::entries() }
 
     pub fn is_forwardable(&self, ip: &IpAddr) -> bool {
         let most_specific = self.find_most_specific(ip);
@@ -96,20 +65,16 @@ impl Rfc6890 {
     }
 }
 
-fn escape_quotes(s: &str) -> String {
-    s.replace('"', r#"\""#)
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::ip_rfc::Rfc6890;
+    use crate::rfc::WithRfc6890;
     use ipnet::IpNet;
 
     #[test]
     fn get_interface_ip_192() {
         let all: IpNet = "192.0.0.0/24".parse().unwrap();
         let specific: IpNet = "192.0.0.0/29".parse().unwrap();
-        let rfc = Rfc6890::create();
+        let rfc = WithRfc6890::create();
         for ip_addr in all.hosts() {
             let is_forwardable = specific.contains(&ip_addr);
             assert_eq!(

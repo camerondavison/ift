@@ -1,8 +1,6 @@
-[dependencies]
-
 [workspace]
-
 members = [
-"ift",
-"ift-cli",
+    "ift",
+    "cli",
+    "gen",
 ]

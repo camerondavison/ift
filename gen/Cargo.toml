@@ -1,12 +1,14 @@
 [package]
-name = "ift"
+name = "ift-gen"
 version = "0.1.0"
 authors = ["Cameron Davison <cameron@novilabs.com>"]
 edition = "2018"
 
 [dependencies]
+clap = "2.32.0"
 pnet = "0.21.0"
 pest = "2.0.2"
 pest_derive = "2.0.1"
 ipnet = "2.0.0"
 regex = "1.1.0"
+ift = { path = "../ift/"}
