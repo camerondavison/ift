@@ -24,9 +24,14 @@ FilterGlobal = { "FilterGlobal" }
 FilterFirst = { "FilterFirst" }
 FilterLast = { "FilterLast" }
 
+sort = {
+    SortBy
+}
+SortBy = { "SortBy" ~ argument_quoted }
+
 WHITESPACE = _{ " " }
 argument_quoted = _{ QUOTATION_MARK ~ argument ~ QUOTATION_MARK }
 argument = { ASCII_ALPHANUMERIC* }
 pipe = _{ "|" }
-expression = { producer ~ (pipe ~ filter)* }
+expression = { producer ~ (pipe ~ (filter|sort))* }
 template = _{ SOI ~ expression ~ EOI }

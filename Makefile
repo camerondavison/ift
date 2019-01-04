@@ -41,6 +41,7 @@ test:
 	cargo run --bin ift-cli -- eval 'GetInterfaceIP "lo0" | FilterIPv4'
 	cargo run --bin ift-cli -- eval 'GetAllInterfaces | FilterForwardable'
 	cargo run --bin ift-cli -- eval 'GetAllInterfaces | FilterGlobal'
+	cargo run --bin ift-cli -- eval 'GetAllInterfaces | FilterIPv4 | SortBy "default" | FilterFirst'
 
 .PHONY: dev-tools
 dev-tools:
