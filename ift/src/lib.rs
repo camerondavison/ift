@@ -89,7 +89,7 @@ fn sort_default_less(
                 }
             }
         }
-        return Ordering::Equal;
+        Ordering::Equal
     }
 }
 
@@ -262,7 +262,7 @@ fn parse_mac_ip_cmd(output: &str) -> String {
             return line["interface:".len()..].trim().to_owned();
         }
     }
-    return "".to_owned();
+    "".to_owned()
 }
 
 fn parse_linux_ip_cmd(output: &str) -> String {
@@ -272,7 +272,7 @@ fn parse_linux_ip_cmd(output: &str) -> String {
             return line.split(' ').last().unwrap().to_owned();
         }
     }
-    return "".to_owned();
+    "".to_owned()
 }
 
 #[cfg(test)]
