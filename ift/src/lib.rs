@@ -284,22 +284,6 @@ mod tests {
     };
 
     #[test]
-    fn get_interface_ip() { assert!(eval("GetInterfaceIP \"eth30\"").is_empty()) }
-
-    #[test]
-    fn get_interface_ip_and_filter() {
-        let eval_str = "GetInterfaceIP \"lo0\" | FilterIPv4";
-        let expected: IpAddr = "127.0.0.1".parse().unwrap();
-        assert_eq!(eval(eval_str).into_iter().next().unwrap(), expected)
-    }
-
-    #[test]
-    fn get_private_ips() {
-        let eval_str = "GetAllInterfaces | FilterForwardable | FilterFlags \"up\"";
-        assert!(eval(eval_str).into_iter().next().is_some())
-    }
-
-    #[test]
     fn test_parse_mac() {
         let out = "\
            route to: default
