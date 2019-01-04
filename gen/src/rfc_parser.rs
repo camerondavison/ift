@@ -98,12 +98,9 @@ fn parse_bool(map: &HashMap<String, String>, key: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        ip_rfc::RfcEntry::Rfc6890,
-        rfc_parser::{
-            parse_table,
-            parse_tables,
-        },
+    use crate::rfc_parser::{
+        parse_table,
+        parse_tables,
     };
     use ift::rfc::RfcEntry::Rfc6890;
 
