@@ -232,7 +232,7 @@ fn read_default_interface_name() -> String {
                 Command::new("ip")
                     .arg("route")
                     .output()
-                    .expect("failed to execute process")
+                    .expect("failed to execute ip")
                     .stdout,
             )
             .unwrap(),
@@ -245,7 +245,7 @@ fn read_default_interface_name() -> String {
                     .arg("get")
                     .arg("default")
                     .output()
-                    .expect("failed to execute process")
+                    .expect("failed to execute route")
                     .stdout,
             )
             .unwrap(),
