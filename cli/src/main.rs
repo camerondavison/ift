@@ -31,10 +31,7 @@ fn main() {
     match matches.subcommand() {
         ("eval", Some(eval_matches)) => {
             let template = eval_matches.value_of("template").unwrap();
-            let ips: Vec<String> = eval(template)
-                .into_iter()
-                .map(|ip_addr| ip_addr.to_string())
-                .collect();
+            let ips: Vec<String> = eval(template).into_iter().map(|ip_addr| ip_addr.to_string()).collect();
 
             println!("[{}]", ips.join(" "));
         }

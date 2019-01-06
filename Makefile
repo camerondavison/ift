@@ -44,6 +44,7 @@ test:
 dev-tools:
 	rustup install nightly
 	rustup component add rustfmt --toolchain nightly
+	rustup component add clippy
 
 .PHONY: clean
 clean:
