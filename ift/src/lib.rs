@@ -259,10 +259,7 @@ fn parse_linux_ip_cmd(output: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use std::net::IpAddr;
-
     use crate::{
-        eval,
         parse_linux_ip_cmd,
         parse_mac_ip_cmd,
     };
