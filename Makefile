@@ -42,6 +42,7 @@ test:
 
 .PHONY: dev-tools
 dev-tools:
+	rustup install nightly
 	rustup component add rustfmt --toolchain nightly
 
 .PHONY: clean
