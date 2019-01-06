@@ -8,11 +8,11 @@ mod tests {
     fn all() {
         let cmds = vec![
             (
-                ["eval", "GetInterfaceIP \"lo0\" | FilterIPv4"],
+                ["eval", "GetInterfaceIP \"lo\" | FilterIPv4"],
                 "[127.0.0.1]\n",
             ),
             (
-                ["eval", "GetInterfaceIP \"lo0\" | FilterIPv6 | FilterFirst"],
+                ["eval", "GetInterfaceIP \"lo\" | FilterIPv6 | FilterFirst"],
                 "[::1]\n",
             ),
         ];
