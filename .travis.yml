@@ -5,3 +5,4 @@ rust:
 os:
   - linux
   - osx
+cache: cargo
