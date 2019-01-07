@@ -6,6 +6,7 @@ edition = "2018"
 description = "A library to read template strings for local network interfaces"
 repository = "https://github.com/camerondavison/ift"
 readme = "README.md"
+license = "MIT/Apache-2.0"
 
 [dependencies]
 pnet = "0.21.0"
