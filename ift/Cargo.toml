@@ -3,6 +3,9 @@ name = "ift"
 version = "0.1.0"
 authors = ["Cameron Davison <cameron@novilabs.com>"]
 edition = "2018"
+description = "A library to read template strings for local network interfaces"
+repository = "https://github.com/camerondavison/ift"
+readme = "README.md"
 
 [dependencies]
 pnet = "0.21.0"
@@ -11,3 +14,6 @@ pest_derive = "2.1.0"
 ipnet = "2.0.0"
 regex = "1.1.0"
 failure = "0.1.5"
+
+[badges]
+travis-ci = { repository = "camerondavison/ift" }
