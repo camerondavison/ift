@@ -287,14 +287,14 @@ fn parse_sort(prev: IfTResult, pair: Pair<'_, Rule>) -> Result<IfTResult, Error>
     match pair.as_rule() {
         Rule::SortBy => {
             let default_interface = read_default_interface_name()?;
-            let mut result = prev.result;
             let attribute: &str = pair.into_inner().next().unwrap().as_str();
             let sorter = match attribute {
                 "default" => Ok(sort_default_less(default_interface)),
                 _ => Err(IfTError::IfTArgumentError(attribute.to_owned())),
             }?;
-            result.sort_by(sorter);
 
+            let mut result = prev.result;
+            result.sort_by(sorter);
             Ok(IfTResult { result })
         }
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
