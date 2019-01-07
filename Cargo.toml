@@ -1,6 +1,6 @@
 [workspace]
 members = [
   "ift",
-  "cli",
-  "gen",
+  "ift-cli",
+  "ift-gen",
 ]
