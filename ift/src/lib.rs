@@ -15,6 +15,7 @@ use std::{
     cmp::Ordering,
     net::IpAddr,
     rc::Rc,
+    str::FromStr,
 };
 
 pub mod rfc;
@@ -27,6 +28,7 @@ use crate::{
 #[derive(Parser)]
 #[grammar = "ift.pest"]
 struct IfTParser;
+
 #[derive(Debug, Fail)]
 pub enum IfTError {
     #[fail(display = "{}", _0)]
@@ -40,7 +42,6 @@ pub enum IfTError {
     #[fail(display = "unable to use argument {}", _0)]
     IfTArgumentError(String),
 }
-use std::str::FromStr;
 
 /// # Evaluate a interface template
 ///
