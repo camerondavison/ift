@@ -1,5 +1,7 @@
-#![recursion_limit = "1024"]
-
+use failure::{
+    Error,
+    Fail,
+};
 use pest::{
     iterators::Pair,
     Parser,
@@ -25,11 +27,6 @@ use crate::{
 #[derive(Parser)]
 #[grammar = "ift.pest"]
 struct IfTParser;
-
-use failure::{
-    Error,
-    Fail,
-};
 #[derive(Debug, Fail)]
 pub enum IfTError {
     #[fail(display = "{}", _0)]
