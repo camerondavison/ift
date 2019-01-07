@@ -23,16 +23,14 @@ use crate::{
     routes::read_default_interface_name,
 };
 
-#[macro_use]
-extern crate error_chain;
 mod errors {
-    error_chain!{
-    foreign_links {
-    Utf8(::std::string::FromUtf8Error);
-    Io(::std::io::Error);
+    use error_chain::*;
 
-
-    }
+    error_chain! {
+        foreign_links {
+            Utf8(::std::string::FromUtf8Error);
+            Io(::std::io::Error);
+        }
     }
 }
 
@@ -117,6 +115,12 @@ struct IfTResult {
     result: Vec<Ip2NetworkInterface>,
 }
 
+fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
+    let template = IfTParser::parse(Rule::template, template_str)?.next().unwrap();
+    let rfc: WithRfc6890 = WithRfc6890::create();
+    Ok(parse_expression(template, &rfc))
+}
+
 fn filter_by_flag(ip: &Ip2NetworkInterface, flag: &str) -> bool {
     match ip.interface.clone() {
         Some(int) => match flag {
@@ -167,13 +171,33 @@ fn sort_default_less(
     }
 }
 
-fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
-    let template = IfTParser::parse(Rule::template, template_str)?.next().unwrap();
-    let rfc: WithRfc6890 = WithRfc6890::create();
-    Ok(parse_value(template, &rfc))
+fn rule_filter_name(iter: Vec<Ip2NetworkInterface>, name: &str) -> IfTResult {
+    IfTResult {
+        result: iter.into_iter().filter(|ip| filter_by_name(ip, name)).collect(),
+    }
 }
 
-fn parse_producer(pair: Pair<Rule>) -> IfTResult {
+fn parse_expression(pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> IfTResult {
+    match pair.as_rule() {
+        Rule::expression => {
+            let mut iter = pair.into_inner();
+            let producer_pair = iter.next().unwrap().into_inner().next().unwrap();
+            let mut base: IfTResult = parse_producer(producer_pair);
+
+            for p in iter {
+                match p.as_rule() {
+                    Rule::filter => base = parse_filter(base, p.into_inner().next().unwrap(), rfc),
+                    Rule::sort => base = parse_sort(base, p.into_inner().next().unwrap()),
+                    _ => unreachable!("only filters and sorts should follow. saw {:?}", p.as_rule()),
+                }
+            }
+            base
+        }
+        _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
+    }
+}
+
+fn parse_producer(pair: Pair<'_, Rule>) -> IfTResult {
     match pair.as_rule() {
         Rule::GetInterface => {
             let interface_name = pair.into_inner().next().unwrap().as_str();
@@ -186,13 +210,7 @@ fn parse_producer(pair: Pair<Rule>) -> IfTResult {
     }
 }
 
-fn rule_filter_name(iter: Vec<Ip2NetworkInterface>, name: &str) -> IfTResult {
-    IfTResult {
-        result: iter.into_iter().filter(|ip| filter_by_name(ip, name)).collect(),
-    }
-}
-
-fn parse_filter(prev: IfTResult, pair: Pair<Rule>, rfc: &WithRfc6890) -> IfTResult {
+fn parse_filter(prev: IfTResult, pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> IfTResult {
     match pair.as_rule() {
         Rule::FilterIPv4 => IfTResult {
             result: prev
@@ -242,7 +260,7 @@ fn parse_filter(prev: IfTResult, pair: Pair<Rule>, rfc: &WithRfc6890) -> IfTResu
     }
 }
 
-fn parse_sort(prev: IfTResult, pair: Pair<Rule>) -> IfTResult {
+fn parse_sort(prev: IfTResult, pair: Pair<'_, Rule>) -> IfTResult {
     let default_interface = read_default_interface_name().expect("unable to find default interface");
 
     match pair.as_rule() {
@@ -254,25 +272,6 @@ fn parse_sort(prev: IfTResult, pair: Pair<Rule>) -> IfTResult {
                 _ => unimplemented!("nothing implemented for sort by [{}]", attribute),
             });
             IfTResult { result }
-        }
-        _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
-    }
-}
-
-fn parse_value(pair: Pair<Rule>, rfc: &WithRfc6890) -> IfTResult {
-    match pair.as_rule() {
-        Rule::expression => {
-            let mut iter = pair.into_inner();
-            let producer_pair = iter.next().unwrap().into_inner().next().unwrap();
-            let mut base: IfTResult = parse_producer(producer_pair);
-            for p in iter {
-                match p.as_rule() {
-                    Rule::filter => base = parse_filter(base, p.into_inner().next().unwrap(), rfc),
-                    Rule::sort => base = parse_sort(base, p.into_inner().next().unwrap()),
-                    _ => unreachable!("only filters and sorts should follow. saw {:?}", p.as_rule()),
-                }
-            }
-            base
         }
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
     }

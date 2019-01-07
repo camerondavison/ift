@@ -1,8 +1,7 @@
 #![recursion_limit = "1024"]
-#[macro_use]
-extern crate error_chain;
 mod errors {
-    error_chain! { }
+    use error_chain::*;
+    error_chain! {}
 }
 use crate::errors::*;
 use clap::{
@@ -12,6 +11,7 @@ use clap::{
     AppSettings,
     SubCommand,
 };
+use error_chain::bail;
 use ift::{
     eval,
     rfc::WithRfc6890,
@@ -25,8 +25,6 @@ fn main() {
             println!("caused by: {}", e);
         }
 
-        // The backtrace is not always generated. Try to run this example
-        // with `RUST_BACKTRACE=1`.
         if let Some(backtrace) = e.backtrace() {
             println!("backtrace: {:?}", backtrace);
         }
@@ -35,7 +33,7 @@ fn main() {
     }
 }
 
-fn run() {
+fn run() -> Result<()> {
     let matches = App::new("ift")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .setting(AppSettings::VersionlessSubcommands)
@@ -55,10 +53,13 @@ fn run() {
 
     match matches.subcommand() {
         ("eval", Some(eval_matches)) => {
-            let template = eval_matches.value_of("template").chain_err(|| "unable to find template argument")
+            let template = eval_matches
+                .value_of("template")
+                .chain_err(|| "unable to find template argument")?;
             let ips: Vec<String> = eval(template).into_iter().map(|ip_addr| ip_addr.to_string()).collect();
 
             println!("[{}]", ips.join(" "));
+            Ok(())
         }
         ("rfc", Some(rfc_matches)) => {
             let name = rfc_matches.value_of("name").unwrap();
@@ -69,6 +70,7 @@ fn run() {
             for entry in rfc.entries {
                 println!("{:?}", entry)
             }
+            Ok(())
         }
         _ => bail!("unknown sub command"),
     }
