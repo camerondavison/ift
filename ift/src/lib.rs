@@ -1,3 +1,5 @@
+#![recursion_limit = "1024"]
+
 use pest::{
     error::Error,
     iterators::Pair,
@@ -20,6 +22,19 @@ use crate::{
     rfc::WithRfc6890,
     routes::read_default_interface_name,
 };
+
+#[macro_use]
+extern crate error_chain;
+mod errors {
+    error_chain!{
+    foreign_links {
+    Utf8(::std::string::FromUtf8Error);
+    Io(::std::io::Error);
+
+
+    }
+    }
+}
 
 /// # Evaluate a interface template
 ///
@@ -228,7 +243,7 @@ fn parse_filter(prev: IfTResult, pair: Pair<Rule>, rfc: &WithRfc6890) -> IfTResu
 }
 
 fn parse_sort(prev: IfTResult, pair: Pair<Rule>) -> IfTResult {
-    let default_interface = read_default_interface_name();
+    let default_interface = read_default_interface_name().expect("unable to find default interface");
 
     match pair.as_rule() {
         Rule::SortBy => {

@@ -1,32 +1,30 @@
 use std::process::Command;
+use crate::errors::*;
 
-pub fn read_default_interface_name() -> String {
+pub fn read_default_interface_name() -> Result<String> {
+
     if cfg!(target_os = "linux") {
-        parse_linux_ip_cmd(
+        Ok(parse_linux_ip_cmd(
             &String::from_utf8(
                 Command::new("ip")
                     .arg("route")
-                    .output()
-                    .expect("failed to execute ip")
+                    .output()?
                     .stdout,
-            )
-            .unwrap(),
-        )
+            )?,
+        ))
     } else if cfg!(target_os = "macos") {
-        parse_mac_ip_cmd(
+        Ok(parse_mac_ip_cmd(
             &String::from_utf8(
                 Command::new("route")
                     .arg("-n")
                     .arg("get")
                     .arg("default")
-                    .output()
-                    .expect("failed to execute route")
+                    .output()?
                     .stdout,
-            )
-            .unwrap(),
-        )
+            )?,
+        ))
     } else {
-        unimplemented!("target os not implemented")
+        unimplemented!("unimplemented os")
     }
 }
 
