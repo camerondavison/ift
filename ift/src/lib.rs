@@ -21,6 +21,60 @@ use crate::{
     routes::read_default_interface_name,
 };
 
+/// # Evaluate a interface template
+///
+/// Given an expression, return a list of IpAddr's that match.
+///
+/// Starting with one producer, use the pipe | character to filter and sort
+/// what IpAddr's will be returned. All <arguments> are quoted with ". One interface
+/// can produce multiple IpAddr's. In mac lo0 produces some IPv4 and some IPv6 addresses.
+///
+/// ### producers
+/// GetAllInterfaces
+///   - Get all the interfaces available
+///
+/// GetInterface <name>
+///   - Short for `GetAllInterfaces | FilterName "name"`
+/// ```
+/// use ift::eval;
+/// assert_eq!(eval("GetInterface \"en0\""), eval("GetAllInterfaces | FilterName \"en0\""));
+/// ```
+///
+/// ### filters
+/// Filter the IpAddr's that were produced. If an interface produces multiple IpAddrs then the
+/// information about that interface is copied to the other IpAddrs. This means that filters
+/// can be on either the interface attributes or the ip attributes along the way.
+///
+/// FilterIPv4
+///   - Filter to only ipv4 ips
+///
+/// FilterIPv6
+///   - Filter to only ipv6 ips
+///
+/// FilterFlags <flag>
+///   - Filter by flags "up"/"down"
+///
+/// FilterName <interface name>
+///   - Filter by a specified interface name
+///
+/// FilterForwardable
+///   - Filter on whether or not it is forwaradable according to [RFC6890](https://tools.ietf.org/rfc/rfc6890.txt)
+///
+/// FilterGlobal
+///   - Filter on whether or not it is global according to [RFC6890](https://tools.ietf.org/rfc/rfc6890.txt)
+///
+/// FilterFirst/FilterLast
+///   - Only return either the first IpAddr or the last IpAddr
+///
+/// ### sorts
+/// SortBy <attribute>
+///   - Sort by attribute "default", looks up the default interface and sorts it to the front
+///
+/// ```
+/// use ift::eval;
+/// assert_eq!(false, eval("GetAllInterfaces").is_empty());
+/// assert_eq!(true, eval("GetAllInterfaces | FilterIPv4 | FilterIPv6").is_empty());
+/// ```
 pub fn eval(s: &str) -> Vec<IpAddr> {
     match parse_ift_string(s) {
         Ok(parsed) => parsed.result.into_iter().map(|ip2ni| ip2ni.ip_addr).collect(),
@@ -106,7 +160,7 @@ fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
 
 fn parse_producer(pair: Pair<Rule>) -> IfTResult {
     match pair.as_rule() {
-        Rule::GetInterfaceIP => {
+        Rule::GetInterface => {
             let interface_name = pair.into_inner().next().unwrap().as_str();
             rule_filter_name(all_interfaces(), interface_name)
         }

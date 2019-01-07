@@ -1,8 +1,8 @@
 producer = {
-    GetInterfaceIP
+    GetInterface
     | GetAllInterfaces
 }
-GetInterfaceIP = { "GetInterfaceIP" ~ argument_quoted }
+GetInterface = { "GetInterface" ~ argument_quoted }
 GetAllInterfaces = { "GetAllInterfaces" }
 
 filter = {
