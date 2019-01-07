@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Cameron Davison <cameron@novilabs.com>"]
 edition = "2018"
 
+[[bin]]
+name = "ift"
+path = "src/main.rs"
+
 [dependencies]
 clap = "2.32.0"
 ift = {path = "../ift/"}
