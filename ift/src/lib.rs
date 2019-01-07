@@ -1,7 +1,6 @@
 #![recursion_limit = "1024"]
 
 use pest::{
-    error::Error,
     iterators::Pair,
     Parser,
 };
@@ -23,16 +22,28 @@ use crate::{
     routes::read_default_interface_name,
 };
 
-mod errors {
-    use error_chain::*;
+#[derive(Parser)]
+#[grammar = "ift.pest"]
+struct IfTParser;
 
-    error_chain! {
-        foreign_links {
-            Utf8(::std::string::FromUtf8Error);
-            Io(::std::io::Error);
-        }
-    }
+use failure::{
+    Error,
+    Fail,
+};
+#[derive(Debug, Fail)]
+pub enum IfTError {
+    #[fail(display = "{}", _0)]
+    Utf8(#[fail(cause)] ::std::string::FromUtf8Error),
+    #[fail(display = "{}", _0)]
+    Io(#[fail(cause)] ::std::io::Error),
+    #[fail(display = "{}", _0)]
+    Pest(::pest::error::Error<Rule>),
+    #[fail(display = "unable to parse flag {}", _0)]
+    IfTFlagError(String),
+    #[fail(display = "unable to use argument {}", _0)]
+    IfTArgumentError(String),
 }
+use std::str::FromStr;
 
 /// # Evaluate a interface template
 ///
@@ -98,10 +109,6 @@ pub fn eval(s: &str) -> Vec<IpAddr> {
     }
 }
 
-#[derive(Parser)]
-#[grammar = "ift.pest"]
-struct IfTParser;
-
 #[derive(Debug)]
 struct Ip2NetworkInterface {
     ip_addr: IpAddr,
@@ -115,18 +122,33 @@ struct IfTResult {
     result: Vec<Ip2NetworkInterface>,
 }
 
-fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error<Rule>> {
+fn parse_ift_string(template_str: &str) -> Result<IfTResult, Error> {
     let template = IfTParser::parse(Rule::template, template_str)?.next().unwrap();
     let rfc: WithRfc6890 = WithRfc6890::create();
-    Ok(parse_expression(template, &rfc))
+    Ok(parse_expression(template, &rfc)?)
 }
 
-fn filter_by_flag(ip: &Ip2NetworkInterface, flag: &str) -> bool {
+enum IfTFlag {
+    UP,
+    DOWN,
+}
+impl FromStr for IfTFlag {
+    type Err = IfTError;
+
+    fn from_str(flag: &str) -> ::std::result::Result<Self, Self::Err> {
+        match flag {
+            "up" => Ok(IfTFlag::UP),
+            "down" => Ok(IfTFlag::DOWN),
+            _ => Err(IfTError::IfTFlagError(flag.to_owned())),
+        }
+    }
+}
+
+fn filter_by_flag(ip: &Ip2NetworkInterface, flag: &IfTFlag) -> bool {
     match ip.interface.clone() {
         Some(int) => match flag {
-            "up" => int.is_up(),
-            "down" => !int.is_up(),
-            _ => unreachable!("unknown flag [{}]", flag),
+            IfTFlag::UP => int.is_up(),
+            IfTFlag::DOWN => !int.is_up(),
         },
         _ => false,
     }
@@ -154,30 +176,13 @@ fn all_interfaces() -> Vec<Ip2NetworkInterface> {
     ret
 }
 
-fn sort_default_less(
-    default_interface_name: String,
-) -> impl FnMut(&Ip2NetworkInterface, &Ip2NetworkInterface) -> Ordering {
-    move |a, b| {
-        if let Some(ref ifa) = a.interface {
-            if let Some(ref ifb) = b.interface {
-                if ifa.name == default_interface_name {
-                    return Ordering::Less;
-                } else if ifb.name == default_interface_name {
-                    return Ordering::Greater;
-                }
-            }
-        }
-        Ordering::Equal
-    }
-}
-
 fn rule_filter_name(iter: Vec<Ip2NetworkInterface>, name: &str) -> IfTResult {
     IfTResult {
         result: iter.into_iter().filter(|ip| filter_by_name(ip, name)).collect(),
     }
 }
 
-fn parse_expression(pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> IfTResult {
+fn parse_expression(pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> Result<IfTResult, Error> {
     match pair.as_rule() {
         Rule::expression => {
             let mut iter = pair.into_inner();
@@ -186,12 +191,12 @@ fn parse_expression(pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> IfTResult {
 
             for p in iter {
                 match p.as_rule() {
-                    Rule::filter => base = parse_filter(base, p.into_inner().next().unwrap(), rfc),
-                    Rule::sort => base = parse_sort(base, p.into_inner().next().unwrap()),
+                    Rule::filter => base = parse_filter(base, p.into_inner().next().unwrap(), rfc)?,
+                    Rule::sort => base = parse_sort(base, p.into_inner().next().unwrap())?,
                     _ => unreachable!("only filters and sorts should follow. saw {:?}", p.as_rule()),
                 }
             }
-            base
+            Ok(base)
         }
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
     }
@@ -210,8 +215,8 @@ fn parse_producer(pair: Pair<'_, Rule>) -> IfTResult {
     }
 }
 
-fn parse_filter(prev: IfTResult, pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> IfTResult {
-    match pair.as_rule() {
+fn parse_filter(prev: IfTResult, pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> Result<IfTResult, Error> {
+    Ok(match pair.as_rule() {
         Rule::FilterIPv4 => IfTResult {
             result: prev
                 .result
@@ -232,8 +237,9 @@ fn parse_filter(prev: IfTResult, pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> IfT
         }
         Rule::FilterFlags => {
             let flag = pair.into_inner().next().unwrap().as_str();
+            let flag: IfTFlag = flag.parse()?;
             IfTResult {
-                result: prev.result.into_iter().filter(|ip| filter_by_flag(ip, flag)).collect(),
+                result: prev.result.into_iter().filter(|ip| filter_by_flag(ip, &flag)).collect(),
             }
         }
         Rule::FilterForwardable => IfTResult {
@@ -257,21 +263,43 @@ fn parse_filter(prev: IfTResult, pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> IfT
             result: prev.result.into_iter().last().into_iter().collect(),
         },
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
+    })
+}
+
+fn sort_default_less(
+    default_interface_name: String,
+) -> impl FnMut(&Ip2NetworkInterface, &Ip2NetworkInterface) -> Ordering {
+    move |a, b| {
+        if let Some(ref ifa) = a.interface {
+            if let Some(ref ifb) = b.interface {
+                if ifa.name == default_interface_name {
+                    return Ordering::Less;
+                } else if ifb.name == default_interface_name {
+                    return Ordering::Greater;
+                }
+            }
+        }
+        Ordering::Equal
     }
 }
 
-fn parse_sort(prev: IfTResult, pair: Pair<'_, Rule>) -> IfTResult {
-    let default_interface = read_default_interface_name().expect("unable to find default interface");
+fn find_sorter(attribute: &str, default_interface: String) -> Result<impl FnMut(&Ip2NetworkInterface, &Ip2NetworkInterface) -> Ordering, IfTError> {
+    match attribute {
+        "default" => Ok(sort_default_less(default_interface)),
+        _ => Err(IfTError::IfTArgumentError(attribute.to_owned())),
+    }
+}
 
+fn parse_sort(prev: IfTResult, pair: Pair<'_, Rule>) -> Result<IfTResult, Error> {
     match pair.as_rule() {
         Rule::SortBy => {
-            let attribute: &str = pair.into_inner().next().unwrap().as_str();
+            let default_interface = read_default_interface_name()?;
             let mut result = prev.result;
-            result.sort_by(match attribute {
-                "default" => sort_default_less(default_interface),
-                _ => unimplemented!("nothing implemented for sort by [{}]", attribute),
-            });
-            IfTResult { result }
+            let attribute: &str = pair.into_inner().next().unwrap().as_str();
+            let sorter = find_sorter(attribute, default_interface)?;
+            result.sort_by(sorter);
+
+            Ok(IfTResult { result })
         }
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
     }

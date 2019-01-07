@@ -1,7 +1,7 @@
-use crate::errors::*;
+use failure::Error;
 use std::process::Command;
 
-pub fn read_default_interface_name() -> Result<String> {
+pub fn read_default_interface_name() -> Result<String, Error> {
     if cfg!(target_os = "linux") {
         Ok(parse_linux_ip_cmd(&String::from_utf8(
             Command::new("ip").arg("route").output()?.stdout,

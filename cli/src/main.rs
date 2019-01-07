@@ -1,9 +1,3 @@
-#![recursion_limit = "1024"]
-mod errors {
-    use error_chain::*;
-    error_chain! {}
-}
-use crate::errors::*;
 use clap::{
     crate_authors,
     crate_version,
@@ -11,7 +5,10 @@ use clap::{
     AppSettings,
     SubCommand,
 };
-use error_chain::bail;
+use failure::{
+    bail,
+    Error,
+};
 use ift::{
     eval,
     rfc::WithRfc6890,
@@ -19,21 +16,12 @@ use ift::{
 
 fn main() {
     if let Err(ref e) = run() {
-        println!("error: {}", e);
-
-        for e in e.iter().skip(1) {
-            println!("caused by: {}", e);
-        }
-
-        if let Some(backtrace) = e.backtrace() {
-            println!("backtrace: {:?}", backtrace);
-        }
-
+        eprintln!("error: {}", e);
         ::std::process::exit(1);
     }
 }
 
-fn run() -> Result<()> {
+fn run() -> Result<(), Error> {
     let matches = App::new("ift")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .setting(AppSettings::VersionlessSubcommands)
@@ -53,9 +41,7 @@ fn run() -> Result<()> {
 
     match matches.subcommand() {
         ("eval", Some(eval_matches)) => {
-            let template = eval_matches
-                .value_of("template")
-                .chain_err(|| "unable to find template argument")?;
+            let template = eval_matches.value_of("template").unwrap();
             let ips: Vec<String> = eval(template).into_iter().map(|ip_addr| ip_addr.to_string()).collect();
 
             println!("[{}]", ips.join(" "));
