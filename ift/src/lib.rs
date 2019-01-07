@@ -283,20 +283,16 @@ fn sort_default_less(
     }
 }
 
-fn find_sorter(attribute: &str, default_interface: String) -> Result<impl FnMut(&Ip2NetworkInterface, &Ip2NetworkInterface) -> Ordering, IfTError> {
-    match attribute {
-        "default" => Ok(sort_default_less(default_interface)),
-        _ => Err(IfTError::IfTArgumentError(attribute.to_owned())),
-    }
-}
-
 fn parse_sort(prev: IfTResult, pair: Pair<'_, Rule>) -> Result<IfTResult, Error> {
     match pair.as_rule() {
         Rule::SortBy => {
             let default_interface = read_default_interface_name()?;
             let mut result = prev.result;
             let attribute: &str = pair.into_inner().next().unwrap().as_str();
-            let sorter = find_sorter(attribute, default_interface)?;
+            let sorter = match attribute {
+                "default" => Ok(sort_default_less(default_interface)),
+                _ => Err(IfTError::IfTArgumentError(attribute.to_owned())),
+            }?;
             result.sort_by(sorter);
 
             Ok(IfTResult { result })
