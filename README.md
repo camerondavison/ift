@@ -13,7 +13,7 @@ Heavily inspired by https://github.com/hashicorp/go-sockaddr
 make gen
 ```
 
-## To Update reamde
+## To Update README
 ```bash
 make update
 ```
