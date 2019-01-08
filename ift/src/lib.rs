@@ -29,6 +29,7 @@ use crate::{
 #[grammar = "ift.pest"]
 struct IfTParser;
 
+/// Some errors that can come from the evaluation of the template
 #[derive(Debug, Fail)]
 pub enum IfTError {
     #[fail(display = "{}", _0)]
