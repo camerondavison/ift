@@ -25,7 +25,6 @@ use std::{
 };
 
 pub mod rfc;
-pub mod rfc_parser;
 mod routes;
 use crate::{
     rfc::WithRfc6890,
