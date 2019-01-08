@@ -1,6 +1,6 @@
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-RFC_6890_TXT := $(ROOT_DIR)/gen/src/rfc6890_entries.txt
-RFC_6890_ENTRIES_RS := $(ROOT_DIR)/ift/src/rfc/rfc6890_entries.rs
+RFC_6890_TXT := $(ROOT_DIR)/src/bin/rfc6890_entries.txt
+RFC_6890_ENTRIES_RS := $(ROOT_DIR)/src/rfc/rfc6890_entries.rs
 
 .PHONY: pre-hook
 pre-hook: lint fmt fix

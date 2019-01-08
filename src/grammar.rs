@@ -62,7 +62,6 @@ fn test_sort_by() {
     assert_rule!(Rule::sort, s);
 }
 
-
 #[test]
 fn test_producer() {
     let s = "GetAllInterfaces";
