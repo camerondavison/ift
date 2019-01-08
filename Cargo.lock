@@ -185,7 +185,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "ift"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "ipnet 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -202,7 +202,7 @@ dependencies = [
  "assert_cmd 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "ift 0.1.0",
+ "ift 0.0.1",
  "predicates 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -211,7 +211,7 @@ name = "ift-gen"
 version = "0.1.0"
 dependencies = [
  "clap 2.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "ift 0.1.0",
+ "ift 0.0.1",
  "ipnet 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pest 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pest_derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
