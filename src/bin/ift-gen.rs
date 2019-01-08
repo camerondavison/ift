@@ -1,20 +1,52 @@
-use ift::rfc::{
-    Rfc6890Entry,
-    RfcEntry::{
-        self,
-        Rfc6890,
-    },
-};
+//! Used te generate the rfc table for use in ift
+//!
+use ift::rfc::Rfc6890Entry;
 use ipnet::IpNet;
 use regex::Regex;
 use std::collections::HashMap;
 
-#[derive(Debug)]
-pub struct RfcInfo {
-    pub output: RfcEntry,
+fn main() {
+    let info = parse_tables(include_str!("rfc6890_entries.txt"));
+    for r in info {
+        if r.termination_date != "N/A" {
+            println!(r"/*{},*/", as_code(&r));
+        } else {
+            println!("{},", as_code(&r));
+        }
+    }
 }
 
-pub fn parse_tables(tables: &str) -> Vec<RfcInfo> {
+fn escape_quotes(s: &str) -> String { s.replace('"', r#"\""#) }
+
+fn as_code(entry: &Rfc6890Entry) -> String {
+    format!(
+        "\
+Rfc6890Entry {{
+    address_block: \"{}\".parse().unwrap(),
+    name: \"{}\".to_owned(),
+    rfc: \"{}\".to_owned(),
+    allocation_date: \"{}\".to_owned(),
+    termination_date: \"{}\".to_owned(),
+    source: {},
+    destination: {},
+    forwardable: {},
+    global: {},
+    reserved_by_protocol: {}
+}}",
+        entry.address_block,
+        escape_quotes(&entry.name),
+        escape_quotes(&entry.rfc),
+        escape_quotes(&entry.allocation_date),
+        escape_quotes(&entry.termination_date),
+        entry.source,
+        entry.destination,
+        entry.forwardable,
+        entry.global,
+        entry.reserved_by_protocol
+    )
+}
+
+fn parse_tables(tables: &str) -> Vec<Rfc6890Entry> {
     let re = Regex::new(r"(?m)\+----+\+----+\+[^|]+\|\s*Attribute\s*\|\s*Value\s*\|[\r\n]+([^+]+\+----+\+----+\+)[\r\n]+([^+]+)\+----+\+----+\+").unwrap();
 
     re.captures_iter(tables)
@@ -26,7 +58,7 @@ pub fn parse_tables(tables: &str) -> Vec<RfcInfo> {
         .collect()
 }
 
-fn parse_table(head: &str, table: &str) -> RfcInfo {
+fn parse_table(head: &str, table: &str) -> Rfc6890Entry {
     let v: Vec<usize> = head.match_indices('+').map(|tup| tup.0).collect();
     assert_eq!(3, v.len(), "expected that the regex only matched 3 '+' signs");
 
@@ -47,8 +79,7 @@ fn parse_table(head: &str, table: &str) -> RfcInfo {
         }
     }
 
-    //println!("{:?}", output);
-    let entry = Rfc6890Entry {
+    Rfc6890Entry {
         address_block: parse_address_block(&output, "Address Block"),
         name: output["Name"].to_owned(),
         rfc: output["RFC"].to_owned(),
@@ -59,10 +90,7 @@ fn parse_table(head: &str, table: &str) -> RfcInfo {
         forwardable: parse_bool(&output, "Forwardable"),
         global: parse_bool(&output, "Global"),
         reserved_by_protocol: parse_bool(&output, "Reserved-by-Protocol"),
-    };
-    //println!("{:?}", entry);
-
-    RfcInfo { output: Rfc6890(entry) }
+    }
 }
 
 fn remove_footnote<'a, 'b>(map: &'a HashMap<String, String>, key: &'b str) -> &'a str {
@@ -90,11 +118,10 @@ fn parse_bool(map: &HashMap<String, String>, key: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::rfc_parser::{
+    use crate::{
         parse_table,
         parse_tables,
     };
-    use ift::rfc::RfcEntry::Rfc6890;
 
     #[test]
     fn test_parse_table() {
@@ -109,7 +136,7 @@ mod tests {
                      | Forwardable          | True                 |
                      | Global               | False                |
                      | Reserved-by-Protocol | False                |";
-        let Rfc6890(r) = parse_table(head, table).output;
+        let r = parse_table(head, table);
         assert!(r.forwardable);
     }
 
@@ -150,7 +177,7 @@ mod tests {
         ";
         let out = parse_tables(tables);
         assert_eq!(2, out.len());
-        let Rfc6890(ref r) = out[1].output;
+        let r = &out[1];
         assert_eq!(false, r.global);
     }
 

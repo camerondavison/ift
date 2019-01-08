@@ -14,7 +14,7 @@ mod tests {
             vec![(["eval", "GetInterface \"lo\" | FilterIPv4"], "[127.0.0.1]\n")]
         };
         for (cmd, stdout) in cmds {
-            Command::main_binary().unwrap().args(&cmd).assert().stdout(stdout);
+            Command::cargo_bin("ift").unwrap().args(&cmd).assert().stdout(stdout);
         }
     }
 }
