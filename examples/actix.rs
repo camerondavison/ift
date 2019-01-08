@@ -6,7 +6,6 @@ use actix_web::{
     HttpRequest,
 };
 use env_logger;
-use std::net::SocketAddr;
 use ift;
 
 fn index(_req: &HttpRequest) -> &'static str { "Hello world!" }
@@ -24,7 +23,7 @@ fn main() {
             .resource("/", |r| r.f(index))
     });
 
-    for ip in ift::eval("GetAllInterfaces | FilterIPv4").into_iter() {
+    for ip in ift::eval("GetPrivateInterfaces").unwrap().into_iter() {
         s = s.bind((ip, 8080)).unwrap();
     }
 
