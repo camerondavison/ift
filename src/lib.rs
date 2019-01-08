@@ -231,13 +231,16 @@ fn parse_producer(pair: Pair<'_, Rule>) -> Result<IfTResult, Error> {
         Rule::GetAllInterfaces => Ok(IfTResult {
             result: all_interfaces(),
         }),
-        Rule::GetPrivateInterfaces => rule_sort_by_attribute(IfTResult {
-            result: all_interfaces()
-                .into_iter()
-                .filter(|ip| filter_by_flag(&ip, &IfTFlag::UP))
-                .filter(|ip| rfc.is_forwardable(&ip.ip_addr))
-                .collect(),
-        }, "default"),
+        Rule::GetPrivateInterfaces => rule_sort_by_attribute(
+            IfTResult {
+                result: all_interfaces()
+                    .into_iter()
+                    .filter(|ip| filter_by_flag(&ip, &IfTFlag::UP))
+                    .filter(|ip| rfc.is_forwardable(&ip.ip_addr))
+                    .collect(),
+            },
+            "default",
+        ),
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
     }
 }
