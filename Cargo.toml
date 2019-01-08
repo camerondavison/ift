@@ -1,6 +1,34 @@
-[workspace]
-members = [
-  "ift",
-  "ift-cli",
-  "ift-gen",
+[package]
+authors = ["Cameron Davison <cameron@novilabs.com>"]
+description = "A library to read template strings for local network interfaces"
+edition = "2018"
+license = "MIT/Apache-2.0"
+name = "ift"
+readme = "README.md"
+repository = "https://github.com/camerondavison/ift"
+version = "0.0.1"
+
+[package.metadata.release]
+sign-commit = true
+upload-doc = true
+pre-release-replacements = [
+  {file="CHANGELOG.md", search="Unreleased", replace="{{version}}"},
+  {file="CHANGELOG.md", search="ReleaseDate", replace="{{date}}"},
+  {file="README.md", search="Current release: [a-z0-9\\.-]+", replace="Current release: {{version}}"},
 ]
+
+[badges]
+travis-ci = { repository = "camerondavison/ift" }
+
+[dependencies]
+clap = "2.32.0"
+failure = "0.1.5"
+ipnet = "2.0.0"
+pest = "2.1.0"
+pest_derive = "2.1.0"
+pnet = "0.21.0"
+regex = "1.1.0"
+
+[dev-dependencies]
+assert_cmd = "0.10.2"
+predicates = "1.0.0"

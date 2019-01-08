@@ -9,8 +9,7 @@ use ift::rfc::{
     Rfc6890Entry,
     RfcEntry::Rfc6890,
 };
-
-mod rfc_parser;
+use ift::rfc_parser;
 
 fn main() {
     let matches = App::new("gen")

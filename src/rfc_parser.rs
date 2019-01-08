@@ -1,4 +1,4 @@
-use ift::rfc::{
+use crate::rfc::{
     Rfc6890Entry,
     RfcEntry::{
         self,

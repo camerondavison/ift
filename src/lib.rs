@@ -1,3 +1,9 @@
+//! # IFT (interface templates)
+//!
+//! Template strings to extract the correct interface and IpAddr to bind your to
+//!
+//! Heavily inspired by https://github.com/hashicorp/go-sockaddr
+//!
 use failure::{
     Error,
     Fail,
@@ -19,6 +25,7 @@ use std::{
 };
 
 pub mod rfc;
+pub mod rfc_parser;
 mod routes;
 use crate::{
     rfc::WithRfc6890,
