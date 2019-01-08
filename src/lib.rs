@@ -12,7 +12,6 @@ use pest::{
     iterators::Pair,
     Parser,
 };
-use pest_derive::*;
 use pnet::datalink::{
     self,
     NetworkInterface,
@@ -30,10 +29,11 @@ use crate::{
     rfc::WithRfc6890,
     routes::read_default_interface_name,
 };
-
-#[derive(Parser)]
-#[grammar = "ift.pest"]
-struct IfTParser;
+mod grammar;
+use crate::grammar::{
+    IfTParser,
+    Rule,
+};
 
 /// Some errors that can come from the evaluation of the template
 #[derive(Debug, Fail)]

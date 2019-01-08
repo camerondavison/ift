@@ -1,3 +1,5 @@
+//! Used te generate the rfc table for use in ift
+//!
 use ift::rfc::Rfc6890Entry;
 use ipnet::IpNet;
 use regex::Regex;
