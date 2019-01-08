@@ -1,8 +1,6 @@
 {{badges}}
 [![Ift Version](https://img.shields.io/crates/v/ift.svg)](https://crates.io/crates/ift)
 
-# {{crate}}
-
 {{readme}}
 
 ## To regenerate the rfc code
