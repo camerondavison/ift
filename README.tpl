@@ -8,7 +8,7 @@
 make gen
 ```
 
-## To Update reamde
+## To Update README
 ```bash
 make update
 ```
