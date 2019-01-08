@@ -1,13 +1,12 @@
+//! to get specific information about rfcs used by the templates
 use ipnet::IpNet;
 use std::net::IpAddr;
 
 mod rfc6890_entries;
 
-#[derive(Debug)]
-pub enum RfcEntry {
-    Rfc6890(Rfc6890Entry),
-}
-
+/// Entry containing everything from the table specified in
+/// [RFC6890](https://tools.ietf.org/rfc/rfc6890.txt)
+///
 #[derive(Debug)]
 pub struct Rfc6890Entry {
     pub address_block: IpNet,
@@ -22,9 +21,13 @@ pub struct Rfc6890Entry {
     pub reserved_by_protocol: bool,
 }
 
+/// Used to check IpAddr's against all the rfc 6890 entries and find the one that
+/// matches the most specific definition
 pub struct WithRfc6890 {
+    /// vector of all of the available entries
     pub entries: Vec<Rfc6890Entry>,
 }
+
 impl WithRfc6890 {
     pub fn create() -> WithRfc6890 { rfc6890_entries::entries() }
 

@@ -38,14 +38,19 @@ use crate::grammar::{
 /// Some errors that can come from the evaluation of the template
 #[derive(Debug, Fail)]
 pub enum IfTError {
+    /// Error parsing string to utf8
     #[fail(display = "{}", _0)]
     Utf8(#[fail(cause)] ::std::string::FromUtf8Error),
+    /// IO error reading template
     #[fail(display = "{}", _0)]
     Io(#[fail(cause)] ::std::io::Error),
+    /// Pest parse error
     #[fail(display = "{}", _0)]
     Pest(::pest::error::Error<Rule>),
+    /// Error parsing a flag
     #[fail(display = "unable to parse flag {}", _0)]
     IfTFlagError(String),
+    /// Error parsing an argument
     #[fail(display = "unable to use argument {}", _0)]
     IfTArgumentError(String),
 }
@@ -59,11 +64,11 @@ pub enum IfTError {
 /// can produce multiple IpAddr's. In mac lo0 produces some IPv4 and some IPv6 addresses.
 ///
 /// ### producers
-/// GetAllInterfaces
-///   - Get all the interfaces available
+/// #### GetAllInterfaces
+/// Get all the interfaces available
 ///
-/// GetInterface <name>
-///   - Short for `GetAllInterfaces | FilterName "name"`
+/// #### GetInterface <name>
+/// Short for `GetAllInterfaces | FilterName "name"`
 /// ```
 /// use ift::eval;
 /// assert_eq!(eval("GetInterface \"en0\""), eval("GetAllInterfaces | FilterName \"en0\""));
@@ -74,30 +79,30 @@ pub enum IfTError {
 /// information about that interface is copied to the other IpAddrs. This means that filters
 /// can be on either the interface attributes or the ip attributes along the way.
 ///
-/// FilterIPv4
-///   - Filter to only ipv4 ips
+/// #### FilterIPv4
+///   Filter to only ipv4 ips
 ///
-/// FilterIPv6
-///   - Filter to only ipv6 ips
+/// #### FilterIPv6
+/// Filter to only ipv6 ips
 ///
-/// FilterFlags <flag>
-///   - Filter by flags "up"/"down"
+/// #### FilterFlags <flag>
+/// Filter by flags "up"/"down"
 ///
-/// FilterName <interface name>
-///   - Filter by a specified interface name
+/// #### FilterName <interface name>
+/// Filter by a specified interface name
 ///
-/// FilterForwardable
-///   - Filter on whether or not it is forwaradable according to [RFC6890](https://tools.ietf.org/rfc/rfc6890.txt)
+/// #### FilterForwardable
+/// Filter on whether or not it is forwaradable according to [RFC6890](https://tools.ietf.org/rfc/rfc6890.txt)
 ///
-/// FilterGlobal
-///   - Filter on whether or not it is global according to [RFC6890](https://tools.ietf.org/rfc/rfc6890.txt)
+/// #### FilterGlobal
+/// Filter on whether or not it is global according to [RFC6890](https://tools.ietf.org/rfc/rfc6890.txt)
 ///
-/// FilterFirst/FilterLast
-///   - Only return either the first IpAddr or the last IpAddr
+/// #### FilterFirst/FilterLast
+/// Only return either the first IpAddr or the last IpAddr
 ///
 /// ### sorts
-/// SortBy <attribute>
-///   - Sort by attribute "default", looks up the default interface and sorts it to the front
+/// #### SortBy <attribute>
+/// Sort by attribute "default", looks up the default interface and sorts it to the front
 ///
 /// ```
 /// use ift::eval;

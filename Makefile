@@ -40,6 +40,10 @@ gen-rfc-6890:
 .PHONY: gen
 gen: download gen-rfc-6890 fmt
 
+.PHONY: update
+update:
+	cargo readme > README.md
+
 .PHONY: test
 test:
 	cargo test
@@ -50,6 +54,7 @@ dev-tools:
 	rustup component add rustfmt --toolchain nightly
 	rustup component add clippy
 	cargo install cargo-release
+	cargo install cargo-readme
 
 .PHONY: clean
 clean:
