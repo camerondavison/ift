@@ -1,9 +1,11 @@
 producer = {
     GetInterface
     | GetAllInterfaces
+    | GetPrivateInterfaces
 }
 GetInterface = { "GetInterface" ~ argument_quoted }
 GetAllInterfaces = { "GetAllInterfaces" }
+GetPrivateInterfaces = { "GetPrivateInterfaces" }
 
 filter = {
     FilterIPv4

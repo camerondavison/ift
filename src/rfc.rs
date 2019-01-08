@@ -54,7 +54,7 @@ impl WithRfc6890 {
         if let Some(entry) = most_specific {
             entry.forwardable
         } else {
-            // if it is not found than it is forwardable
+            // todo: maybe make this return true/false/empty (empty for not found?)
             true
         }
     }
@@ -83,6 +83,7 @@ impl WithRfc6890 {
         if let Some(entry) = most_specific {
             entry.global
         } else {
+            // todo: maybe make this return true/false/empty (empty for not found?)
             true
         }
     }
@@ -108,6 +109,7 @@ impl WithRfc6890 {
 mod tests {
     use crate::rfc::WithRfc6890;
     use ipnet::IpNet;
+    use std::net::IpAddr;
 
     // check that 192 because there are multiple definitions and
     // we want to make sure that it picks the most specific one
@@ -135,5 +137,12 @@ mod tests {
         for ip_addr in all.hosts() {
             assert!(rfc.is_global(&ip_addr), "failure on ip {}", ip_addr)
         }
+    }
+
+    #[test]
+    fn is_loopback() {
+        let ip: IpAddr = "127.0.0.1".parse().unwrap();
+        let rfc = WithRfc6890::create();
+        assert_eq!(false, rfc.is_forwardable(&ip))
     }
 }
