@@ -120,7 +120,6 @@ mod tests {
         parse_table,
         parse_tables,
     };
-    use ift::rfc::RfcEntry::Rfc6890;
 
     #[test]
     fn test_parse_table() {
@@ -135,7 +134,7 @@ mod tests {
                      | Forwardable          | True                 |
                      | Global               | False                |
                      | Reserved-by-Protocol | False                |";
-        let Rfc6890(r) = parse_table(head, table).output;
+        let r = parse_table(head, table);
         assert!(r.forwardable);
     }
 
@@ -176,7 +175,7 @@ mod tests {
         ";
         let out = parse_tables(tables);
         assert_eq!(2, out.len());
-        let Rfc6890(ref r) = out[1].output;
+        let r = &out[1];
         assert_eq!(false, r.global);
     }
 
