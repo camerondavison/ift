@@ -67,11 +67,20 @@ pub enum IfTError {
 /// #### GetAllInterfaces
 /// Get all the interfaces available
 ///
+/// #### GetPrivateInterfaces
+/// Get sorted list of interfaces available that are forwardable, and up. Sorted by default first.
+///
+/// Short for `GetAllInterfaces | FilterFlags "up" | SortBy "default"`
+/// ```
+/// use ift::eval;
+/// assert_eq!(eval("GetPrivateInterfaces").unwrap(), eval(r#"GetAllInterfaces | FilterFlags "up" | FilterForwardable | SortBy "default""#).unwrap());
+/// ```
+///
 /// #### GetInterface <name>
 /// Short for `GetAllInterfaces | FilterName "name"`
 /// ```
 /// use ift::eval;
-/// assert_eq!(eval("GetInterface \"en0\""), eval("GetAllInterfaces | FilterName \"en0\""));
+/// assert_eq!(eval("GetInterface \"en0\"").unwrap(), eval("GetAllInterfaces | FilterName \"en0\"").unwrap());
 /// ```
 ///
 /// ### filters
@@ -105,19 +114,18 @@ pub enum IfTError {
 /// Sort by attribute "default", looks up the default interface and sorts it to the front
 ///
 /// ```
-/// use ift::eval;
-/// assert_eq!(false, eval("GetAllInterfaces").is_empty());
-/// assert_eq!(true, eval("GetAllInterfaces | FilterIPv4 | FilterIPv6").is_empty());
+/// use ift::evals;
+/// assert_eq!(true, evals("GetAllInterfaces").is_some());
+/// assert_eq!(false, evals("GetAllInterfaces | FilterIPv4 | FilterIPv6").is_some());
 /// ```
-pub fn eval(s: &str) -> Vec<IpAddr> {
-    match parse_ift_string(s) {
-        Ok(parsed) => parsed.result.into_iter().map(|ip2ni| ip2ni.ip_addr).collect(),
-        Err(err) => {
-            eprintln!("{}", err);
-            vec![]
-        }
-    }
+pub fn eval(s: &str) -> Result<Vec<IpAddr>, Error> {
+    let parsed = parse_ift_string(s)?;
+    Ok(parsed.result.into_iter().map(|ip2ni| ip2ni.ip_addr).collect())
 }
+
+/// Just like `eval`.
+/// Returns the first IpAddr as an option. None if empty vector.
+pub fn evals(s: &str) -> Option<IpAddr> { eval(s).unwrap().into_iter().next() }
 
 #[derive(Debug)]
 struct Ip2NetworkInterface {
@@ -197,7 +205,7 @@ fn parse_expression(pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> Result<IfTResult
         Rule::expression => {
             let mut iter = pair.into_inner();
             let producer_pair = iter.next().unwrap().into_inner().next().unwrap();
-            let mut base: IfTResult = parse_producer(producer_pair);
+            let mut base: IfTResult = parse_producer(producer_pair)?;
 
             for p in iter {
                 match p.as_rule() {
@@ -212,15 +220,27 @@ fn parse_expression(pair: Pair<'_, Rule>, rfc: &WithRfc6890) -> Result<IfTResult
     }
 }
 
-fn parse_producer(pair: Pair<'_, Rule>) -> IfTResult {
+fn parse_producer(pair: Pair<'_, Rule>) -> Result<IfTResult, Error> {
+    let rfc = WithRfc6890::create();
+
     match pair.as_rule() {
         Rule::GetInterface => {
             let interface_name = pair.into_inner().next().unwrap().as_str();
-            rule_filter_name(all_interfaces(), interface_name)
+            Ok(rule_filter_name(all_interfaces(), interface_name))
         }
-        Rule::GetAllInterfaces => IfTResult {
+        Rule::GetAllInterfaces => Ok(IfTResult {
             result: all_interfaces(),
-        },
+        }),
+        Rule::GetPrivateInterfaces => rule_sort_by_attribute(
+            IfTResult {
+                result: all_interfaces()
+                    .into_iter()
+                    .filter(|ip| filter_by_flag(&ip, &IfTFlag::UP))
+                    .filter(|ip| rfc.is_forwardable(&ip.ip_addr))
+                    .collect(),
+            },
+            "default",
+        ),
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
     }
 }
@@ -296,17 +316,20 @@ fn sort_default_less(
 fn parse_sort(prev: IfTResult, pair: Pair<'_, Rule>) -> Result<IfTResult, Error> {
     match pair.as_rule() {
         Rule::SortBy => {
-            let default_interface = read_default_interface_name()?;
             let attribute: &str = pair.into_inner().next().unwrap().as_str();
-            let sorter = match attribute {
-                "default" => Ok(sort_default_less(default_interface)),
-                _ => Err(IfTError::IfTArgumentError(attribute.to_owned())),
-            }?;
-
-            let mut result = prev.result;
-            result.sort_by(sorter);
-            Ok(IfTResult { result })
+            rule_sort_by_attribute(prev, attribute)
         }
         _ => unreachable!("unable to parse rule {:?}", pair.as_rule()),
     }
+}
+
+fn rule_sort_by_attribute(prev: IfTResult, attribute: &str) -> Result<IfTResult, Error> {
+    let default_interface = read_default_interface_name()?;
+    let sorter = match attribute {
+        "default" => Ok(sort_default_less(default_interface)),
+        _ => Err(IfTError::IfTArgumentError(attribute.to_owned())),
+    }?;
+    let mut result = prev.result;
+    result.sort_by(sorter);
+    Ok(IfTResult { result })
 }
