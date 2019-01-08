@@ -49,6 +49,7 @@ dev-tools:
 	rustup install nightly
 	rustup component add rustfmt --toolchain nightly
 	rustup component add clippy
+	cargo install cargo-release
 
 .PHONY: clean
 clean:
