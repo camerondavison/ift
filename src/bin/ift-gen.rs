@@ -1,6 +1,4 @@
-use ift::rfc::{
-    Rfc6890Entry,
-};
+use ift::rfc::Rfc6890Entry;
 use ipnet::IpNet;
 use regex::Regex;
 use std::collections::HashMap;
@@ -8,11 +6,11 @@ use std::collections::HashMap;
 fn main() {
     let info = parse_tables(include_str!("rfc6890_entries.txt"));
     for r in info {
-                if r.termination_date != "N/A" {
-                    println!(r"/*{},*/", as_code(&r));
-                } else {
-                    println!("{},", as_code(&r));
-                }
+        if r.termination_date != "N/A" {
+            println!(r"/*{},*/", as_code(&r));
+        } else {
+            println!("{},", as_code(&r));
+        }
     }
 }
 
@@ -118,9 +116,11 @@ fn parse_bool(map: &HashMap<String, String>, key: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        parse_table,
+        parse_tables,
+    };
     use ift::rfc::RfcEntry::Rfc6890;
-    use crate::parse_table;
-    use crate::parse_tables;
 
     #[test]
     fn test_parse_table() {
