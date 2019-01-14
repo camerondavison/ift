@@ -1,3 +1,4 @@
+#![deny(missing_docs)]
 //! # IFT (interface templates)
 //!
 //! Template strings to extract the correct interface and IpAddr to bind your to

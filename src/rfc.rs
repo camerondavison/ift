@@ -9,15 +9,25 @@ mod rfc6890_entries;
 ///
 #[derive(Debug)]
 pub struct Rfc6890Entry {
+    /// IpNet block
     pub address_block: IpNet,
+    /// Name from RFC
     pub name: String,
+    /// Original RFC
     pub rfc: String,
+    /// Allocation Date
     pub allocation_date: String,
+    /// If terminated by when
     pub termination_date: String,
+    /// Is a source
     pub source: bool,
+    /// Is a destination
     pub destination: bool,
+    /// Is forwardable
     pub forwardable: bool,
+    /// Is global
     pub global: bool,
+    /// Is reserved
     pub reserved_by_protocol: bool,
 }
 
@@ -29,6 +39,7 @@ pub struct WithRfc6890 {
 }
 
 impl WithRfc6890 {
+    /// Build the WithRfc6890, by creating the list of Rfc6890Entry's
     pub fn create() -> WithRfc6890 { rfc6890_entries::entries() }
 
     /// RFC6890 https://tools.ietf.org/rfc/rfc6890.txt
