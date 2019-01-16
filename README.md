@@ -45,23 +45,25 @@ for ip in ift::eval("GetPrivateInterfaces").unwrap().into_iter() {
 - get only interfaces with ipv6 addresses
   `GetAllInterfaces | FilterIPv6`
 
-### Examples
+#### Example Code
 There are examples in the [examples](https://github.com/camerondavison/ift/tree/master/examples)
 folder.
 * [actix](https://github.com/camerondavison/ift/blob/master/examples/actix.rs) - bind multiple private interfaces
 
 
-## To regenerate the rfc code
+## developing
+
+### To regenerate the RFC code
 ```bash
 make gen
 ```
 
-## To Update README
+### To Update README
 ```bash
 make update
 ```
 
-## To Release
+### To Release
 
 You can use the [cargo release](https://github.com/sunng87/cargo-release) command.
 

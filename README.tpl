@@ -3,17 +3,19 @@
 
 {{readme}}
 
-## To regenerate the rfc code
+## developing
+
+### To regenerate the RFC code
 ```bash
 make gen
 ```
 
-## To Update README
+### To Update README
 ```bash
 make update
 ```
 
-## To Release
+### To Release
 
 You can use the [cargo release](https://github.com/sunng87/cargo-release) command.
 
