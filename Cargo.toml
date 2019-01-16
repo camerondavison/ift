@@ -1,5 +1,5 @@
 [package]
-authors = ["Cameron Davison <cameron@novilabs.com>"]
+authors = ["Cameron Davison <cameron.davison@gmail.com>"]
 description = "A library to read template strings for local network interfaces"
 edition = "2018"
 license = "MIT"
