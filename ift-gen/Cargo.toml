@@ -1,0 +1,12 @@
+[package]
+authors = ["Cameron Davison <cameron.davison@gmail.com>"]
+description = "A generator for ift rfc"
+edition = "2018"
+license = "MIT"
+name = "ift-gen"
+version = "0.1.0"
+
+[dependencies]
+regex = "1.1.0"
+ipnet = "2.0.0"
+ift = { path = "../"}

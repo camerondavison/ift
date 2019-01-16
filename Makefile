@@ -1,5 +1,5 @@
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-RFC_6890_TXT := $(ROOT_DIR)/src/bin/rfc6890_entries.txt
+RFC_6890_TXT := $(ROOT_DIR)/ift-gen/src/rfc6890_entries.txt
 RFC_6890_ENTRIES_RS := $(ROOT_DIR)/src/rfc/rfc6890_entries.rs
 
 .PHONY: pre-hook
@@ -31,7 +31,7 @@ gen-rfc-6890:
 	echo "use crate::rfc::WithRfc6890;" > $(RFC_6890_ENTRIES_RS).tmp
 	echo "use crate::rfc::Rfc6890Entry;" >> $(RFC_6890_ENTRIES_RS).tmp
 	echo "pub fn entries() -> WithRfc6890 { WithRfc6890 { entries: vec![" >> $(RFC_6890_ENTRIES_RS).tmp
-	cargo run --bin ift-gen -- rfc 6890 >> $(RFC_6890_ENTRIES_RS).tmp
+	cargo run -p ift-gen -- rfc 6890 >> $(RFC_6890_ENTRIES_RS).tmp
 	echo "]}}" >> $(RFC_6890_ENTRIES_RS).tmp
 
 # then move it into the correct loc
