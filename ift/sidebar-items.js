@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["IfTError","Some errors that can come from the evaluation of the template"]],"fn":[["eval","Evaluate a interface template"],["evals","Just like `eval`. Returns the first IpAddr as an option. None if empty vector."]],"mod":[["rfc","to get specific information about rfcs used by the templates"]]});

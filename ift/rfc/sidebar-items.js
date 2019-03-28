@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Rfc6890Entry","Entry containing everything from the table specified in RFC6890"],["WithRfc6890","Used to check IpAddr's against all the rfc 6890 entries and find the one that matches the most specific definition"]]});
