@@ -15,7 +15,7 @@ members = ["ift-gen"]
 travis-ci = {repository = "camerondavison/ift"}
 
 [dependencies]
-clap = "2.32.0"
+clap = "2.33.3"
 failure = "0.1.8"
 ipnet = "2.3.0"
 pest = "2.1.3"
