@@ -16,7 +16,9 @@ fn main() {
     }
 }
 
-fn escape_quotes(s: &str) -> String { s.replace('"', r#"\""#) }
+fn escape_quotes(s: &str) -> String {
+    s.replace('"', r#"\""#)
+}
 
 fn as_code(entry: &Rfc6890Entry) -> String {
     format!(
@@ -118,10 +120,7 @@ fn parse_bool(map: &HashMap<String, String>, key: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        parse_table,
-        parse_tables,
-    };
+    use crate::{parse_table, parse_tables};
 
     #[test]
     fn test_parse_table() {
@@ -180,5 +179,4 @@ mod tests {
         let r = &out[1];
         assert_eq!(false, r.global);
     }
-
 }

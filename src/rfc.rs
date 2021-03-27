@@ -40,7 +40,9 @@ pub struct WithRfc6890 {
 
 impl WithRfc6890 {
     /// Build the WithRfc6890, by creating the list of Rfc6890Entry's
-    pub fn create() -> WithRfc6890 { rfc6890_entries::entries() }
+    pub fn create() -> WithRfc6890 {
+        rfc6890_entries::entries()
+    }
 
     /// RFC6890 https://tools.ietf.org/rfc/rfc6890.txt
     ///

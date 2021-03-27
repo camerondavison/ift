@@ -1,9 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use ift::{
-        eval,
-        evals,
-    };
+    use ift::{eval, evals};
 
     #[test]
     fn all() {
@@ -16,5 +13,7 @@ mod tests {
     }
 
     #[test]
-    fn it_fails() { eval("adoe").expect_err("should fail"); }
+    fn it_fails() {
+        eval("adoe").expect_err("should fail");
+    }
 }

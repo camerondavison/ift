@@ -1,18 +1,6 @@
-use clap::{
-    crate_authors,
-    crate_version,
-    App,
-    AppSettings,
-    SubCommand,
-};
-use failure::{
-    bail,
-    Error,
-};
-use ift::{
-    eval,
-    rfc::WithRfc6890,
-};
+use clap::{crate_authors, crate_version, App, AppSettings, SubCommand};
+use failure::{bail, Error};
+use ift::{eval, rfc::WithRfc6890};
 
 fn main() {
     if let Err(ref e) = run() {

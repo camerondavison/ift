@@ -48,36 +48,16 @@
 //! folder.
 //! * [actix](https://github.com/camerondavison/ift/blob/master/examples/actix.rs) - bind multiple private interfaces
 //!
-use failure::{
-    Error,
-    Fail,
-};
-use pest::{
-    iterators::Pair,
-    Parser,
-};
-use pnet::datalink::{
-    self,
-    NetworkInterface,
-};
-use std::{
-    cmp::Ordering,
-    net::IpAddr,
-    rc::Rc,
-    str::FromStr,
-};
+use failure::{Error, Fail};
+use pest::{iterators::Pair, Parser};
+use pnet::datalink::{self, NetworkInterface};
+use std::{cmp::Ordering, net::IpAddr, rc::Rc, str::FromStr};
 
 pub mod rfc;
 mod routes;
-use crate::{
-    rfc::WithRfc6890,
-    routes::read_default_interface_name,
-};
+use crate::{rfc::WithRfc6890, routes::read_default_interface_name};
 mod grammar;
-use crate::grammar::{
-    IfTParser,
-    Rule,
-};
+use crate::grammar::{IfTParser, Rule};
 
 /// Some errors that can come from the evaluation of the template
 #[derive(Debug, Fail)]
@@ -169,7 +149,9 @@ pub fn eval(s: &str) -> Result<Vec<IpAddr>, Error> {
 
 /// Just like `eval`.
 /// Returns the first IpAddr as an option. None if empty vector.
-pub fn evals(s: &str) -> Option<IpAddr> { eval(s).unwrap().into_iter().next() }
+pub fn evals(s: &str) -> Option<IpAddr> {
+    eval(s).unwrap().into_iter().next()
+}
 
 #[derive(Debug)]
 struct Ip2NetworkInterface {

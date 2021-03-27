@@ -42,10 +42,7 @@ fn parse_linux_ip_cmd(output: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::routes::{
-        parse_linux_ip_cmd,
-        parse_mac_ip_cmd,
-    };
+    use crate::routes::{parse_linux_ip_cmd, parse_mac_ip_cmd};
 
     #[test]
     fn test_parse_mac() {

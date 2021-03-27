@@ -1,7 +1,4 @@
-use crate::rfc::{
-    Rfc6890Entry,
-    WithRfc6890,
-};
+use crate::rfc::{Rfc6890Entry, WithRfc6890};
 pub fn entries() -> WithRfc6890 {
     WithRfc6890 {
         entries: vec![

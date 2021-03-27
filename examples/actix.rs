@@ -1,14 +1,11 @@
 use actix;
-use actix_web::{
-    middleware,
-    server,
-    App,
-    HttpRequest,
-};
+use actix_web::{middleware, server, App, HttpRequest};
 use env_logger;
 use ift;
 
-fn index(_req: &HttpRequest) -> &'static str { "Hello world!" }
+fn index(_req: &HttpRequest) -> &'static str {
+    "Hello world!"
+}
 
 fn main() {
     ::std::env::set_var("RUST_LOG", "actix_web=info");
